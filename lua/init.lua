@@ -62,25 +62,17 @@ function M.append_to_markdown(lines, file_path, start_line, end_line)
 	-- Open or create the notes markdown file
 	local markdown_path = vim.fn.expand("~/.local/share/nvim/notes.md")
 	print(markdown_path)
+	local current_buf_lang = vim.bo.filetype
 	local note_buf = M.open_file_in_floating_window(markdown_path)
-
-	-- if vim.fn.filereadable(markdown_path) == 1 then
-	-- 	vim.api.nvim_buf_call(note_buf, function()
-	-- 		vim.cmd("edit " .. markdown_path)
-	-- 	end)
-	-- else
-	-- 	vim.api.nvim_buf_call(note_buf, function()
-	-- 		vim.cmd("new " .. markdown_path)
-	-- 	end)
-	-- end
 
 	-- -- Append the note
 	local ref = string.format("- [%s:%d-%d]\n", file_path, start_line, end_line)
-	print(ref)
 	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, vim.split(ref, "\n"))
+	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, {"```" .. current_buf_lang})
 	for _, line in ipairs(lines) do
 		vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, { "    " .. line })
 	end
+	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, {"```"})
 end
 
 -- Main function to handle the workflow
