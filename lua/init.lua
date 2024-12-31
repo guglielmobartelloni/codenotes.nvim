@@ -65,14 +65,22 @@ function M.append_to_markdown(lines, file_path, start_line, end_line)
 	local current_buf_lang = vim.bo.filetype
 	local note_buf = M.open_file_in_floating_window(markdown_path)
 
-	-- -- Append the note
+	-- Append the note
 	local ref = string.format("- [%s:%d-%d]\n", file_path, start_line, end_line)
-	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, vim.split(ref, "\n"))
-	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, {"```" .. current_buf_lang})
+	local ref_lines = vim.split(ref, "\n")
+
+	-- Add the reference lines
+	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, ref_lines)
+
+	-- Move the cursor to the end of the `- [%s:%d-%d]` line
+	vim.api.nvim_win_set_cursor(0, { vim.api.nvim_buf_line_count(note_buf), #ref_lines[#ref_lines] })
+
+	-- Add the code block
+	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, { "```" .. current_buf_lang })
 	for _, line in ipairs(lines) do
 		vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, { "    " .. line })
 	end
-	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, {"```"})
+	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, { "```" })
 end
 
 -- Main function to handle the workflow
