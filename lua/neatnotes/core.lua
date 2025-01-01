@@ -1,5 +1,10 @@
 local M = {}
 
+-- Default configuration
+M.config = {
+	notes_dir = vim.fn.expand("~/.local/share/nvim/"),
+}
+
 -- Function to get the selected lines and buffer info
 function M.get_selected_lines()
 	local bufnr = vim.api.nvim_get_current_buf()
@@ -102,8 +107,7 @@ function M.append_to_markdown(lines, file_path, start_line, end_line)
 	local current_file = M.get_project_name()
 
 	-- Open or create the notes markdown file
-	local notes_dir = vim.fn.expand("~/.local/share/nvim/")
-	local markdown_path = notes_dir .. "" .. current_file .. "_notes.md"
+	local markdown_path = M.config.notes_dir .. "" .. current_file .. "_notes.md"
 	local current_buf_lang = vim.bo.filetype
 	local note_buf = M.open_split_window(markdown_path)
 
@@ -133,6 +137,8 @@ end
 
 -- Setup function to map keys
 function M.setup(opts)
+	M.config = vim.tbl_extend("force", M.config, opts or {})
+
 	vim.api.nvim_set_keymap(
 		"v",
 		"<leader>tn",
