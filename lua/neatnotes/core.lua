@@ -103,7 +103,7 @@ function M.setup(opts)
 	vim.api.nvim_set_keymap(
 		"v",
 		"<leader>tn",
-		[[:lua require('note_plugin').take_note()<CR>]],
+		[[:lua require('neatnotes.core').take_note()<CR>]],
 		{ noremap = true, silent = true }
 	)
 	vim.api.nvim_create_user_command("TakeNote", function()
@@ -112,28 +112,6 @@ function M.setup(opts)
 		desc = "Take note of selected text",
 		range = true,
 	})
-end
-
-function M.print_table(tbl, indent)
-	if type(tbl) ~= "table" then
-		print(tostring(tbl))
-		return
-	end
-
-	indent = indent or 0
-	local formatting = string.rep("  ", indent)
-
-	print(formatting .. "{")
-	for key, value in pairs(tbl) do
-		local display_key = tostring(key)
-		if type(value) == "table" then
-			print(formatting .. "  " .. display_key .. " = ")
-			M.print_table(value, indent + 1)
-		else
-			print(formatting .. "  " .. display_key .. " = " .. tostring(value))
-		end
-	end
-	print(formatting .. "}")
 end
 
 return M
