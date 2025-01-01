@@ -65,17 +65,44 @@ function M.open_file_in_floating_window(file_path)
 	return buf
 end
 
--- Function to append notes to a Markdown file
+local function get_project_root()
+	local cwd = vim.fn.getcwd()
+	local util = vim.loop
+
+	local function find_root(dir, marker)
+		if util.fs_stat(dir .. "/" .. marker) then
+			return dir
+		end
+		local parent = vim.fn.fnamemodify(dir, ":h")
+		if parent == dir then
+			return nil -- Reached filesystem root
+		end
+		return find_root(parent, marker)
+	end
+
+	-- Look for common project markers
+	return find_root(cwd, ".git") or cwd
+end
+
 function M.append_to_markdown(lines, file_path, start_line, end_line)
-	-- local note_buf = M.create_floating_window()
+	-- Determine the project root
+	local project_root = get_project_root()
+	-- Compute the relative path from the project root
+	local relative_file_path = vim.fn.fnamemodify(file_path, ":.")
+
+	-- Ensure the path is relative to the project root
+	relative_file_path = relative_file_path:gsub("^" .. vim.fn.escape(project_root, "/"), "")
+
+	local current_file = M.get_project_name()
 
 	-- Open or create the notes markdown file
-	local markdown_path = vim.fn.expand("~/.local/share/nvim/notes.md")
+	local notes_dir = vim.fn.expand("~/.local/share/nvim/")
+	local markdown_path = notes_dir .. "" .. current_file .. "_notes.md"
 	local current_buf_lang = vim.bo.filetype
 	local note_buf = M.open_split_window(markdown_path)
 
 	-- Append the note
-	local ref = string.format("- [%s:%d-%d]\n", file_path, start_line, end_line)
+	local ref = string.format("- [%s:%d-%d]\n", relative_file_path, start_line, end_line)
 	local ref_lines = vim.split(ref, "\n")
 
 	-- Add the reference lines
@@ -112,6 +139,38 @@ function M.setup(opts)
 		desc = "Take note of selected text",
 		range = true,
 	})
+end
+
+function M.get_project_root()
+	local util = vim.loop
+	local cwd = vim.fn.getcwd()
+
+	-- Helper to find a directory with a specific marker
+	local function find_root(dir, marker)
+		if util.fs_stat(dir .. "/" .. marker) then
+			return dir
+		end
+		local parent = vim.fn.fnamemodify(dir, ":h")
+		if parent == dir then
+			return nil -- Reached filesystem root
+		end
+		return find_root(parent, marker)
+	end
+
+	-- Try to find `.git` or other project markers
+	local root = find_root(cwd, ".git")
+	if not root then
+		-- Fallback to cwd if no marker is found
+		root = cwd
+	end
+
+	return root
+end
+
+-- Get project name from the root directory
+function M.get_project_name()
+	local project_root = M.get_project_root()
+	return vim.fn.fnamemodify(project_root, ":t")
 end
 
 return M
