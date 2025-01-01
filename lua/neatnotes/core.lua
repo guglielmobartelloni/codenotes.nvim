@@ -15,6 +15,16 @@ function M.get_selected_lines()
 	}
 end
 
+function M.open_split_window(file_path)
+	vim.cmd("vsplit")
+	local win = vim.api.nvim_get_current_win()
+	local buf = vim.api.nvim_create_buf(true, false)
+	vim.api.nvim_win_set_buf(win, buf)
+	vim.cmd("edit " .. vim.fn.fnameescape(file_path))
+	buf = vim.api.nvim_get_current_buf()
+	return buf
+end
+
 function M.open_file_in_floating_window(file_path)
 	-- Check if a buffer with this name already exists
 	local existing_buf = vim.fn.bufnr(file_path)
@@ -61,9 +71,8 @@ function M.append_to_markdown(lines, file_path, start_line, end_line)
 
 	-- Open or create the notes markdown file
 	local markdown_path = vim.fn.expand("~/.local/share/nvim/notes.md")
-	print(markdown_path)
 	local current_buf_lang = vim.bo.filetype
-	local note_buf = M.open_file_in_floating_window(markdown_path)
+	local note_buf = M.open_split_window(markdown_path)
 
 	-- Append the note
 	local ref = string.format("- [%s:%d-%d]\n", file_path, start_line, end_line)
@@ -90,13 +99,19 @@ function M.take_note()
 end
 
 -- Setup function to map keys
-function M.setup()
+function M.setup(opts)
 	vim.api.nvim_set_keymap(
 		"v",
 		"<leader>tn",
 		[[:lua require('note_plugin').take_note()<CR>]],
 		{ noremap = true, silent = true }
 	)
+	vim.api.nvim_create_user_command("TakeNote", function()
+		require("neatnotes.core").take_note()
+	end, {
+		desc = "Take note of selected text",
+		range = true,
+	})
 end
 
 function M.print_table(tbl, indent)
@@ -120,7 +135,5 @@ function M.print_table(tbl, indent)
 	end
 	print(formatting .. "}")
 end
-
-M.take_note()
 
 return M
