@@ -46,7 +46,7 @@ Notes are stored in `~/.local/share/nvim/notes.md`
 
 ```lua
 require('neatnotes').setup({
-    -- Default configuration (coming soon)
+    notes_dir = "/your/custom/path/"
 })
 ```
 
