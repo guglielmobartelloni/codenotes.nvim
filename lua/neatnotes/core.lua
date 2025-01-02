@@ -127,14 +127,14 @@ function M.append_to_markdown(lines, file_path, start_line, end_line)
 		or M.open_split_window(markdown_path)
 
 	-- Append the note
-	local ref = string.format("- [%s:%d-%d]\n", relative_file_path, start_line, end_line)
+	local ref = string.format("- [%s:%d-%d]\n" .. "     ", relative_file_path, start_line, end_line)
 	local ref_lines = vim.split(ref, "\n")
 
 	-- Add the reference lines
 	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, ref_lines)
 
 	-- Move the cursor to the end of the `- [%s:%d-%d]` line
-	vim.api.nvim_win_set_cursor(0, { vim.api.nvim_buf_line_count(note_buf), #ref_lines[#ref_lines] })
+	vim.api.nvim_win_set_cursor(0, { vim.api.nvim_buf_line_count(note_buf), #ref_lines[#ref_lines] + 4 })
 
 	-- Add the code block with spaces indentation
 	vim.api.nvim_buf_set_lines(note_buf, -1, -1, false, { "    " .. "```" .. current_buf_lang })
