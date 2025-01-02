@@ -15,6 +15,7 @@ Introducing neatnotes.nvim – a simple note-taking plugin that automatically cr
 ## Features
 
 - Take notes from visually selected code
+- Floating window support
 - Automatic language detection for syntax highlighting
 - Reference tracking with file paths and line numbers
 
@@ -55,7 +56,8 @@ Notes are stored in `~/.local/share/nvim/`
 
 ```lua
 require('neatnotes').setup({
-    notes_dir = "/your/custom/path/"
+    notes_dir = "/your/custom/path/",
+	use_floating_window = false,
 })
 ```
 

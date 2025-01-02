@@ -3,6 +3,7 @@ local M = {}
 -- Default configuration
 M.config = {
 	notes_dir = vim.fn.expand("~/.local/share/nvim/"),
+	use_floating_window = false,
 }
 
 -- Function to get the selected lines and buffer info
@@ -37,6 +38,17 @@ function M.open_split_window(file_path)
 end
 
 function M.open_file_in_floating_window(file_path)
+	-- Check if the file is already open in a window
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		local name = vim.api.nvim_buf_get_name(buf)
+		if name == file_path then
+			-- File is already open in this window; focus on it
+			vim.api.nvim_set_current_win(win)
+			return buf
+		end
+	end
+
 	-- Check if a buffer with this name already exists
 	local existing_buf = vim.fn.bufnr(file_path)
 	local buf
@@ -57,7 +69,7 @@ function M.open_file_in_floating_window(file_path)
 	local row = math.floor((vim.o.lines - height) / 2)
 
 	-- Open the floating window
-	vim.api.nvim_open_win(buf, true, {
+	local win = vim.api.nvim_open_win(buf, true, {
 		relative = "editor",
 		width = width,
 		height = height,
@@ -70,9 +82,10 @@ function M.open_file_in_floating_window(file_path)
 	-- Load the file into the buffer if it's a new buffer
 	if existing_buf == -1 then
 		vim.api.nvim_buf_call(buf, function()
-			vim.cmd("silent edit " .. file_path)
+			vim.cmd("silent edit " .. vim.fn.fnameescape(file_path))
 		end)
 	end
+
 	return buf
 end
 
@@ -109,7 +122,9 @@ function M.append_to_markdown(lines, file_path, start_line, end_line)
 	-- Open or create the notes markdown file
 	local markdown_path = M.config.notes_dir .. "" .. current_file .. "_notes.md"
 	local current_buf_lang = vim.bo.filetype
-	local note_buf = M.open_split_window(markdown_path)
+
+	local note_buf = M.config.use_floating_window and M.open_file_in_floating_window(markdown_path)
+		or M.open_split_window(markdown_path)
 
 	-- Append the note
 	local ref = string.format("- [%s:%d-%d]\n", relative_file_path, start_line, end_line)
