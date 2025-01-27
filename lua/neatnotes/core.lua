@@ -157,11 +157,11 @@ function M.setup(opts)
 	vim.api.nvim_set_keymap(
 		"v",
 		"<leader>tn",
-		[[:lua require('neatnotes.core').take_note()<CR>]],
+		[[:lua require('codenotes.core').take_note()<CR>]],
 		{ noremap = true, silent = true }
 	)
 	vim.api.nvim_create_user_command("TakeNote", function()
-		require("neatnotes.core").take_note()
+		require("codenotes.core").take_note()
 	end, {
 		desc = "Take note of selected text",
 		range = true,
