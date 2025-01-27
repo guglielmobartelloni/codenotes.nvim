@@ -1,4 +1,4 @@
-# NeatNotes.nvim
+# CodeNotes.nvim
 
 A Neovim plugin for efficiently capturing and organizing code snippets and notes directly from your editor.
 
@@ -7,7 +7,7 @@ A Neovim plugin for efficiently capturing and organizing code snippets and notes
 When reviewing code in a project, it's often helpful to take notes with comments and explanations about the code’s functionality. 
 However, manually copying code into a separate file for note-taking can be tedious, and it’s easy to lose context and references in the process.
 
-Introducing neatnotes.nvim – a simple note-taking plugin that automatically creates a dedicated note file for your project. It inserts the selected code snippet with references to the file and line numbers in a clean, easy-to-read markdown format.
+Introducing codenotes.nvim – a simple note-taking plugin that automatically creates a dedicated note file for your project. It inserts the selected code snippet with references to the file and line numbers in a clean, easy-to-read markdown format.
 
 ![Preview](https://i.imgur.com/eMkbQQj.gif)
 
@@ -25,9 +25,9 @@ Introducing neatnotes.nvim – a simple note-taking plugin that automatically cr
 
 ```lua
 {
-    "guglielmobartelloni/neatnotes.nvim",
+    "guglielmobartelloni/codenotes.nvim",
     config = function()
-        require("neatnotes").setup()
+        require("codenotes").setup()
     end
 }
 ```
@@ -36,9 +36,9 @@ Introducing neatnotes.nvim – a simple note-taking plugin that automatically cr
 
 ```lua
 use {
-    'guglielmobartelloni/neatnotes.nvim',
+    'guglielmobartelloni/codenotes.nvim',
     config = function()
-        require('neatnotes').setup()
+        require('codenotes').setup()
     end
 }
 ```
@@ -55,7 +55,7 @@ Notes are stored in `~/.local/share/nvim/`
 ## Configuration
 
 ```lua
-require('neatnotes').setup({
+require('codenotes').setup({
     notes_dir = "/your/custom/path/",
 	use_floating_window = false,
 })
